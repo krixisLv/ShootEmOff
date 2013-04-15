@@ -4,30 +4,36 @@
     android:versionCode="3"
     android:versionName="1.0" >
 
-    <application
-        android:icon="@drawable/icon"
-        android:label="@string/app_name" >
-        <activity
-            android:name="com.shootemoff.game.GameActivity"
-            android:label="@string/app_name" >
-
-        </activity>
-        <activity
-            android:name="com.shootemoff.game.StartScreenActivity"
-            android:label="@string/app_name" >
-                        <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-    </application>
-
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <uses-sdk
         android:minSdkVersion="3"
         android:targetSdkVersion="8" />
+    
+    <application
+        android:icon="@drawable/icon"
+        android:label="@string/app_name" >
+        <activity
+            android:name="com.shootemoff.game.GameActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name="com.shootemoff.game.StartScreenActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.shootemoff.game.GameOverActivity"
+            android:label="@string/title_activity_game_over"
+            android:screenOrientation="landscape" >
+        </activity>
+    </application>
 
     <supports-screens
         android:anyDensity="true"

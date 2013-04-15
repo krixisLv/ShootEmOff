@@ -1,18 +1,29 @@
 package com.shootemoff.framework.impl;
 
-import com.shootemoff.framework.*;
-
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Configuration;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
+
+import com.shootemoff.framework.Audio;
+import com.shootemoff.framework.FileIO;
+import com.shootemoff.framework.Game;
+import com.shootemoff.framework.Graphics;
+import com.shootemoff.framework.Input;
+import com.shootemoff.framework.Screen;
+import com.shootemoff.framework.Vibration;
+import com.shootemoff.game.GameOverActivity;
+import com.shootemoff.shootemoffgame.R;
 
 
 public abstract class AndroidGame extends Activity implements Game
@@ -24,12 +35,15 @@ public abstract class AndroidGame extends Activity implements Game
 	FileIO fileIO;
 	Vibration vibration;
 	Screen screen;
+	public static Context context;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
+		context = getApplicationContext();
+		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);

@@ -1,23 +1,23 @@
 package com.shootemoff.game;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.*;
+import java.util.Iterator;
 
-import com.shootemoff.framework.*;
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.GradientDrawable;
+
+import com.shootemoff.framework.Graphics;
+import com.shootemoff.framework.Screen;
 import com.shootemoff.shootemoffgame.R;
 
-import android.graphics.*;
-import android.graphics.drawable.*;
-import android.util.Log;
-import android.content.res.*;
-import android.content.*;
-import android.app.*;
 
-
-public class GameScreen extends Screen {
+public class GameScreen extends Screen 
+{
+	GameActivity gActivity;
+	
     long startTime = System.nanoTime();
 	World world;
 
@@ -27,9 +27,14 @@ public class GameScreen extends Screen {
 	GradientDrawable gradient;
 
 	Context r;
+	
+	int mainCoreColor = 0xff0f4915;
+	int enemyDotColor = 0xff000000;
         
-    public GameScreen(Game game) {
-        super(game);
+    public GameScreen(GameActivity game)
+    {
+    	super(game);
+    	gActivity = game;
 		r = (Context) game;
 		world = new World(game);	
 		world.renew();
@@ -41,13 +46,18 @@ public class GameScreen extends Screen {
 		paint.setAntiAlias(true);
 		paint.setStrokeWidth(0.0F);
 		
-		// This gradient looks quite smooth, but not perfect
+		/* This is the background red gradient
 		gradient = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
 				new int[]{0xff410a0a, 0xff6c0b0b});
+				*/
+		
+		gradient = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
+				new int[]{0xffc2c2c2, 0xffb1b1b1, 0xff949494, 0xff727272, 0xff5c5c5c,});
+		
 		gradient.setGradientType(GradientDrawable.RADIAL_GRADIENT);
 		gradient.setGradientRadius((int) world.offScreenRadius);
 		gradient.setDither(false);
-		gradient.setGradientCenter(0.5F, 0.7F);
+		gradient.setGradientCenter(0.2F, 0.5F);
 		gradient.setBounds(new Rect(0, 0, game.getGraphics().getWidth(),
 				   	game.getGraphics().getHeight()));
 		
@@ -56,17 +66,19 @@ public class GameScreen extends Screen {
     }
     
     @Override
-    public void update(float deltaTime) {
+    public void update(float deltaTime) 
+    {
 		world.update(deltaTime);
     }
 	
     @Override
-    public void present(float deltaTime) {
+    public void present(float deltaTime)
+    {
 	    Canvas c = game.getGraphics().getCanvas();    
 		gradient.draw(c);
 		paint.setStyle(Paint.Style.FILL_AND_STROKE);
-		if(world.core.shieldEnergy > 0.0F)
-		{
+		
+		if(world.core.shieldEnergy > 0.0F){
 			paint.setColor(0xff003cca);
 			paint.setAlpha((int) (80.0F +
 					   	(255.0F - 80.0F) * world.core.shieldEnergy));
@@ -74,12 +86,13 @@ public class GameScreen extends Screen {
 				world.core.shieldRadius, paint);
 			paint.setAlpha(255);
 		}
-		paint.setColor(0xffdbdbdb);//main core color
+		paint.setColor(mainCoreColor);
 		c.drawCircle(world.core.coords.x, world.core.coords.y,
 			   	world.core.maxRadius * world.core.health,
 				paint);
 		paint.setStyle(Paint.Style.STROKE);
-		paint.setColor(0xffffffff);
+		
+		paint.setColor(mainCoreColor);
 		paint.setStrokeWidth(Core.SHIELD_WIDTH);
 		c.drawArc(rect, (360.0F - world.core.angle),
 				(360.0F - world.core.GAP_ANGLE), false, paint);
@@ -106,8 +119,6 @@ public class GameScreen extends Screen {
 		paint.setColor(0xff111111);
 		c.drawRoundRect(shieldControl, 15, 15, paint);
 		
-		drawShieldPadMessage(r.getString(R.string.shield_pad), c);
-		
 		//color the dots
 		paint.setStyle(Paint.Style.FILL_AND_STROKE);
 		paint.setStrokeWidth(0.0F);
@@ -117,9 +128,9 @@ public class GameScreen extends Screen {
 			int color = 0;
 			Dot dot = iterator.next();
 			if(dot.type == Dot.Type.Enemy)
-				color = 0xff000000;//blaaaack
+				color = enemyDotColor;
 			else if(dot.type == Dot.Type.Health)
-				color = 0xffdbdbdb;//main core color
+				color = mainCoreColor;//main core color
 
 			paint.setColor(color);
 			c.drawCircle(dot.coords.x, dot.coords.y,
@@ -128,16 +139,18 @@ public class GameScreen extends Screen {
 	
 		if(world.state == World.GameState.Running)
 			drawMessage(world.getTime(), c);
-		else if(world.state == World.GameState.Ready)
-			drawMessage(r.getString(R.string.ready), c);
-		else if(world.state == World.GameState.Paused)
-			drawMessage(r.getString(R.string.paused), c);
+//		else if(world.state == World.GameState.Ready)
+//			drawMessage(r.getString(R.string.ready), c);
+//		else if(world.state == World.GameState.Paused)
+//			drawMessage(r.getString(R.string.paused), c);
 		else if(world.state == World.GameState.GameOver)
-			drawMessage(r.getString(R.string.game_over)+
-					"\n"+
-					r.getString(R.string.your_time) +  " " + world.getTime() +
-					"\n\n" + r.getString(R.string.game_url), c);
+			ReturnGameResult(world.getTime());
 	}
+    
+    private void ReturnGameResult(String score)
+    {
+    	gActivity.finishActivity(score);
+    }
     
     private void drawShieldPadMessage(String message, Canvas c)
     {
@@ -156,38 +169,50 @@ public class GameScreen extends Screen {
 		paint.setTextSize((float)oldSize);
     }
 
-	private void drawMessage(String message, Canvas c)
+	private void drawMessage(String message, Canvas canvas)
 	{
-		float y = paint.getTextSize();
-		for(String line: message.split("\n"))
-		{
-		// Draw black stroke
-		paint.setStrokeWidth(2F);
-		paint.setColor(0xff000000);
-	    paint.setStyle(Paint.Style.STROKE);
-
-		c.drawText(line, c.getWidth()/2F, y, paint);
-		// Draw white text
-		paint.setStrokeWidth(0.0F);
-		paint.setColor(0xffffffff);
-	    paint.setStyle(Paint.Style.FILL);
-
-		c.drawText(line, c.getWidth()/2F, y, paint);
-
-		y += paint.getTextSize();
+		float y = (float)(paint.getTextSize());
+		float x = (float)(canvas.getWidth() - paint.getTextSize());
+		for(String line: message.split("\n")){
+			// Draw black stroke
+			paint.setStrokeWidth(2F);
+			paint.setColor(0xff000000);
+		    paint.setStyle(Paint.Style.STROKE);
+		    
+		    canvas.save();
+		    canvas.rotate(90, x, y);
+			canvas.drawText(line, x, y, paint);
+			canvas.restore();
+			// Draw white text
+			paint.setStrokeWidth(0.0F);
+			paint.setColor(0xffffffff);
+		    paint.setStyle(Paint.Style.FILL);
+	
+		    canvas.save();
+		    canvas.rotate(90, x, y);
+		    canvas.drawText(line, x, y, paint);
+		    canvas.restore();
+			//c.drawText(line, c.getWidth(), y, paint);
+	
+			y += paint.getTextSize();
 		}
 	}
 
     @Override
-    public void pause() {
+    public void pause() 
+    {
 		world.state = World.GameState.Paused;
     }
 
     @Override
-    public void resume() {
+    public void resume()
+    {
+    	//nothing to do
     }
 
     @Override
-    public void dispose() {
+    public void dispose()
+    {
+    	//nothing to do
     }            
 }

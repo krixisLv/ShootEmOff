@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">ShootEmDown</string>
-    <string name="ready">Ready?\nTouch the screen!</string>
+    <string name="app_name">ShootEmOff</string>
     <string name="paused">Game is paused.\nTouch the screen\nto resume.</string>
-    <string name="shield_pad">SHIELD</string>
-    <string name="gun_sphere">GUN SPHERE</string>
     <string name="game_over">It`s over!\nTAP ME to restart.</string>
     <string name="your_time">Best you got:</string>
     <string name="game_url">Shoot `Em Down</string>
@@ -15,5 +12,9 @@
     <string name="button_play">Start The Game</string>
     <string name="button_score">Score Board</string>
     <string name="button_course">Crash Course</string>
+    <string name="title_activity_game_over">GameOverActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_save_result">SaveResultActivity</string>
+    <string name="preference_file_key">com.shootemoff.game.</string>
 
 </resources>

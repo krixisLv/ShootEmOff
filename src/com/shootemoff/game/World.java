@@ -28,11 +28,12 @@ public class World
 	public float offScreenRadius;
 	private final float SHIELD_HEALTH = 20.0F;
 	private final float CORE_HEALTH = 6.0F;
-	private final int[] ALLOWED_ANGLES = {110, 330, 10, 180, 350, 300, 30, 200, -20, 100, 50, 320, 270};
+	//private final int[] ALLOWED_ANGLES = {110, 330, 10, 180, 350, 300, 30, 200, -20, 100, 50, 320, 270};
+	private final int[] ALLOWED_ANGLES = {30, 200, -20, 100, 50, 320, 270, 0, 70, 340, 45, 20, 190, -80};
    	
-	public float shield_top_coef = (float)0.87;
-	public float shield_bottom_coef = (float)0.97;
-	public float shield_right_coef = (float)0.45;
+	public float shield_top_coef = (float)0.10;
+	public float shield_bottom_coef = (float)0.40;
+	public float shield_right_coef = (float)0.20;
 	public float shield_left_coef = (float)0.06;
 	
 	public float shield_top;
@@ -63,8 +64,8 @@ public class World
 		this.game = game;
 		Graphics g = game.getGraphics();
 		// Construct core
-		core.coords = new VectorF((float) g.getWidth() / 2,
-			   	(float) g.getHeight() / (float) 1.4);
+		core.coords = new VectorF((float) g.getWidth() / 4,
+			   	(float) g.getHeight() / (float) 2);
 		core.shieldRadius = (float) g.getWidth() / 4;
 		core.maxRadius = core.shieldRadius * 0.7F;
 		core.angle = 45.0F;
@@ -142,16 +143,26 @@ public class World
 			double touchX = (double) game.getInput().getTouchX();
 			double touchY = (double) game.getInput().getTouchY();
 			
-			if(touchX >= shield_left && touchX <= shield_right &&
+//			if(touchX >= shield_left && touchX <= shield_right &&
+//					touchY >= shield_top && touchY <= shield_bottom){
+//				
+//				float shield_pad_width = shield_right - shield_left;
+//				float touchPoint = (float)((touchX - shield_left) / shield_pad_width);
+//				//need to calculate appropriate angles for the shield and then bind them with the control pad
+//				
+//				int angleSign = ((0.5 - touchPoint) > 0 )? 1 : -1;
+//				
+//				//min 50 max 180
+//				core.angle = ((110) * angleSign * touchPoint);
+//				
+//			}
+			if(touchY >= shield_left && touchX <= shield_right &&
 					touchY >= shield_top && touchY <= shield_bottom){
 				
-				float shield_pad_width = shield_right - shield_left;
-				float touchPoint = (float)((touchX - shield_left) / shield_pad_width);
-				//need to calculate appropriate angles for the shield and then bind them with the control pad
+				float shield_pad_width = shield_bottom - shield_top;
+				float touchPoint = (float)((touchY - shield_top) / shield_pad_width);
 				
-				//min 50 max 180
-				core.angle = ((180 - 50) * touchPoint) + 50;
-				
+				core.angle = (200 * touchPoint)+ 270;
 			}
 			else if(false){
 				//shooting sphere controls
@@ -166,24 +177,6 @@ public class World
 			}
 		}
 	}
-
-	// Removes accelerometer noise and makes
-	// core shield rotate smooth when user touches / untouches
-	// the screen (and game switch accelerometer / touchscreen control).
-	// Stabilisation increases, as factor value becomes larger.
-//	private float stabilizeAngle(float real, float current, float factor)
-//	{
-//		real = normAngle(real);
-//		current = normAngle(current);
-//		// Stabilisation should choose shortest way
-//		// (is it better to rotate clockwise or counterclockwise?)
-//		if(current - real > 180F)
-//			real += 360;
-//		if(real - current > 180F)
-//			real -= 360;
-//		// (current + current + current ... + real) / numberOfElements
-//		return normAngle((current * factor + real) / (factor + 1F));
-//	}
 
 	private void updateReady(float deltaTime)
 	{
