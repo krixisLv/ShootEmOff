@@ -16,5 +16,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_save_result">SaveResultActivity</string>
     <string name="preference_file_key">com.shootemoff.game.</string>
+    <string name="title_activity_score_board">ScoreBoardActivity</string>
+    <string name="score_board">Score Board</string>
 
 </resources>

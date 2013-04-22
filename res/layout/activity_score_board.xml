@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+<TextView
+  android:id="@+id/header"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="@string/score_board"
+  />
+<!--<TextView
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:hint="Enter File Name" />
+<EditText
+  android:id="@+id/filename"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content" 
+  android:inputType="text"/>
+<TextView
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="Enter Content" />
+<EditText
+  android:id="@+id/content"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content" 
+  android:inputType="text"/>
+<Button
+  android:id="@+id/save"
+  android:layout_width="fill_parent"
+  android:layout_height="wrap_content"
+  android:text="Save"/>-->
+<ListView
+  android:id="@+id/list"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  />
+</LinearLayout>

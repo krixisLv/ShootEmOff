@@ -9,8 +9,40 @@
     tools:context=".GameOverActivity" >
 
     <TextView
+        android:id="@+id/game_score"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="111dp"
+        android:layout_marginTop="32dp"
         android:text="@string/hello_world" />
+
+    <TextView
+        android:id="@+id/game_over_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="34dp"
+        android:text="@string/hello_world" />
+
+    <Button
+        android:id="@+id/submit_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="120dp"
+        android:onClick="StoreScore"
+        android:text="Button" />
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/game_over_text"
+        android:layout_below="@+id/game_score"
+        android:layout_marginTop="64dp"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
 
 </RelativeLayout>

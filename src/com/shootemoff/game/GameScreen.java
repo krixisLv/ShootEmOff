@@ -143,8 +143,9 @@ public class GameScreen extends Screen
 //			drawMessage(r.getString(R.string.ready), c);
 //		else if(world.state == World.GameState.Paused)
 //			drawMessage(r.getString(R.string.paused), c);
-		else if(world.state == World.GameState.GameOver)
+		else if(world.state == World.GameState.GameOver){
 			ReturnGameResult(world.getTime());
+		}
 	}
     
     private void ReturnGameResult(String score)

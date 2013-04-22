@@ -14,13 +14,6 @@ public class GameActivity extends AndroidGame
         return new GameScreen(this); 
     }
     
-//    public static void DisplayGameOverScreen(String score)
-//    {
-//    	Intent intent = new Intent(context, GameOverActivity.class);
-//    	intent.putExtra("score", score);
-//		startActivity(intent);
-//    }
-    
     public void finishActivity(String score)
     {
     	Intent returnIntent = new Intent();
@@ -28,5 +21,10 @@ public class GameActivity extends AndroidGame
 		setResult(RESULT_OK, returnIntent);     
 		finish();
     }
+    
+    public void onBackPressed(){
+    	//Your code here
+    	super.onBackPressed();
+	}
 }
 
