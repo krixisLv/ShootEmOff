@@ -1,10 +1,15 @@
 package com.shootemoff.game;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -21,28 +26,56 @@ public class ScoreBoardActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_score_board);
 		
-		Bundle data = getIntent().getExtras();
+		Resources res = getResources();
+		String[] scores = res.getStringArray(R.array.scores_array);
+		String[] score_names = res.getStringArray(R.array.score_names_array);
 		
-		int size = data.getInt("score_count");
-		
-		ScoreObject[] scores = new ScoreObject[size];
-		
-		for(int i = 0; i < size; i++){
-			String name = "score_" + i;
-			scores[i] = data.getParcelable(name);
-		}
+		StorageHandler handler = new StorageHandler();
 
-		TextView text = (TextView)findViewById(R.id.header);
+		SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 		
+		String defaultValueString = res.getString(R.string.saved_score_default);
+		int defaultValue = Integer.parseInt(defaultValueString);
+		String defaultName = res.getString(R.string.saved_score_name_default);
+		
+		String max_scores_saved_string = res.getString(R.string.max_scores_saved);
+		int max_scores_saved = Integer.parseInt(max_scores_saved_string);
+		for(int i = 0; i < max_scores_saved; i++){
+			//String  score1 = sharedPref.getString(scores[i], defaultValueString);
+			int score = sharedPref.getInt(scores[i], defaultValue);
+			//int score = Integer.parseInt(score1);
+			if(score != defaultValue){
+				String name = sharedPref.getString(score_names[i], defaultName);
+				handler.AddScore(name, score);
+			}
+			else{
+				break;
+			}
+		}
+		
+		TextView text = (TextView)findViewById(R.id.header);
+		int size = handler.GetSize();
 		ListView scoreListView = (ListView)findViewById(R.id.list);
 		String[] scoreArray = new String[size];
+//		
+//		if(size > 0){
+//			text.setText("there is some score!");
+//		}
 		
-		if(size > 0){
-			text.setText("there is some score!");
-		}
+
+		
+		ScoreObject[] scores_from_file = handler.GetHighScores();
 		
 		for(int i = 0; i < size; i++){
-			String score_line = "NAME : " + scores[i].name + " SCORE : " +scores[i].score ;
+			String score_line;
+			if(scores_from_file[i].score < 100){
+				score_line = "NAME : " + scores_from_file[i].name + " SCORE : " + scores_from_file[i].score ;
+			}
+			else{
+				int minutes = (scores_from_file[i].score / 100);
+				int seconds = scores_from_file[i].score - (minutes * 100);
+				score_line = "NAME : " + scores_from_file[i].name + " SCORE : " + minutes + ":" + seconds;
+			}
 			scoreArray[i] = score_line;
 		}
 		

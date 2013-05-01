@@ -1,14 +1,11 @@
 package com.shootemoff.game;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.Menu;
 import android.view.View;
 import android.widget.TextView;
@@ -30,6 +27,7 @@ public class GameOverActivity extends Activity
 		Bundle b = getIntent().getExtras();
 		
 		String score_string = b.getString("score");
+		score_string = score_string.replaceAll("\\D+","");
 		game_score = Integer.parseInt(score_string);
 		
 		TextView t = (TextView)findViewById(R.id.game_score); 
@@ -50,27 +48,52 @@ public class GameOverActivity extends Activity
 		TextView t = (TextView)findViewById(R.id.username); 
 		String username = t.getText().toString();
 		
-		StorageHandler handler = new StorageHandler();
+		Resources res = getResources();
+		String[] scores = res.getStringArray(R.array.scores_array);
+		String[] score_names = res.getStringArray(R.array.score_names_array);
 		
-		String FILENAME = "score_file";
+		StorageHandler handler = new StorageHandler();
 
-		try{
-			//FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_APPEND);
-			FileInputStream fis = new FileInputStream(FILENAME);
-			handler.ReadScores(fis);
-			//fis.write(string.getBytes());
-			fis.close();
-		}
-		catch(IOException e){
-			e.printStackTrace();
+		SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+		
+		String defaultValueString = res.getString(R.string.saved_score_default);
+		int defaultValue = Integer.parseInt(defaultValueString);
+		String defaultName = res.getString(R.string.saved_score_name_default);
+		
+		String max_scores_saved_string = res.getString(R.string.max_scores_saved);
+		int max_scores_saved = Integer.parseInt(max_scores_saved_string);
+		for(int i = 0; i < max_scores_saved; i++){
+			//String  score1 = sharedPref.getString(scores[i], defaultValueString);
+			int score = sharedPref.getInt(scores[i], defaultValue);
+			//int score = Integer.parseInt(score1);
+			if(score != defaultValue){
+				String name = sharedPref.getString(score_names[i], defaultName);
+				handler.AddScore(name, score);
+			}
+			else{
+				break;
+			}
 		}
 		
 		boolean isScoreAdded = handler.AddScore(username, game_score);
 		
 		if(isScoreAdded == true){
+			
+			SharedPreferences.Editor editor = sharedPref.edit();
+			
+			int size = handler.GetSize();
+			ScoreObject[] scores_to_save = handler.GetHighScores();
+			
+			for(int i = 0; i < size; i++){
+				editor.putInt(scores[i], scores_to_save[i].score);
+				editor.putString(score_names[i], scores_to_save[i].name);
+			}
+			
+			editor.commit();
+			
 			Toast.makeText(
 					GameOverActivity.this,
-					FILENAME + " saved",
+					"New Score saved",
 				    Toast.LENGTH_LONG).show();
 		}
 		else{
@@ -80,31 +103,57 @@ public class GameOverActivity extends Activity
 				    Toast.LENGTH_LONG).show();
 		}
 		
-		try{
-			FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-			handler.WriteScores(fos);
-			fos.close();
-		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
-		
-		ScoreObject[] scores = handler.GetHighScores();
+//		try{
+//			//FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_APPEND);
+//			FileInputStream fis = new FileInputStream(FILENAME);
+//			handler.ReadScores(fis);
+//			//fis.write(string.getBytes());
+//			fis.close();
+//		}
+//		catch(IOException e){
+//			e.printStackTrace();
+//		}
+//		
+//		boolean isScoreAdded = handler.AddScore(username, game_score);
+//		
+//		if(isScoreAdded == true){
+//			Toast.makeText(
+//					GameOverActivity.this,
+//					FILENAME + " saved",
+//				    Toast.LENGTH_LONG).show();
+//		}
+//		else{
+//			Toast.makeText(
+//					GameOverActivity.this,
+//					"Sorry! Your score is too low. You suck!",
+//				    Toast.LENGTH_LONG).show();
+//		}
+//		
+//		try{
+//			FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+//			handler.WriteScores(fos);
+//			fos.close();
+//		}
+//		catch(IOException e){
+//			e.printStackTrace();
+//		}
+//		
+//		ScoreObject[] scores = handler.GetHighScores();
 		Intent intent = new Intent (this, ScoreBoardActivity.class);
-		int size = handler.GetSize();
-		
-		for (int i = 0; i < size; i++) {
-			String name = "score_" + i;
-		    intent.putExtra(name, scores[i]);
-		}
-		intent.putExtra("score_count", size);
+//		int size = handler.GetSize();
+//		
+//		for (int i = 0; i < size; i++) {
+//			String name = "score_" + i;
+//		    intent.putExtra(name, scores[i]);
+//		}
+//		intent.putExtra("score_count", size);
 		startActivity(intent);
 	}
-	
-	public void onBackPressed(){
-		//Nothing to do
-		super.onBackPressed();
-	}
-	
-	
+//	
+//	public void onBackPressed(){
+//		//Nothing to do
+//		super.onBackPressed();
+//	}
+//	
+//	
 }
