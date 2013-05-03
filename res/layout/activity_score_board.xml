@@ -27,12 +27,13 @@
   android:id="@+id/content"
   android:layout_width="fill_parent"
   android:layout_height="wrap_content" 
-  android:inputType="text"/>
+  android:inputType="text"/>-->
 <Button
-  android:id="@+id/save"
+  android:id="@+id/back_to_menu"
   android:layout_width="fill_parent"
   android:layout_height="wrap_content"
-  android:text="Save"/>-->
+  android:text="@string/back_to_menu"
+  android:onClick="BackToMenu"/>
 <ListView
   android:id="@+id/list"
   android:layout_width="fill_parent"

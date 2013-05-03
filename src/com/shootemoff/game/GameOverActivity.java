@@ -63,9 +63,9 @@ public class GameOverActivity extends Activity
 		String max_scores_saved_string = res.getString(R.string.max_scores_saved);
 		int max_scores_saved = Integer.parseInt(max_scores_saved_string);
 		for(int i = 0; i < max_scores_saved; i++){
-			//String  score1 = sharedPref.getString(scores[i], defaultValueString);
+
 			int score = sharedPref.getInt(scores[i], defaultValue);
-			//int score = Integer.parseInt(score1);
+
 			if(score != defaultValue){
 				String name = sharedPref.getString(score_names[i], defaultName);
 				handler.AddScore(name, score);
@@ -102,58 +102,15 @@ public class GameOverActivity extends Activity
 					"Sorry! Your score is too low. You suck!",
 				    Toast.LENGTH_LONG).show();
 		}
-		
-//		try{
-//			//FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_APPEND);
-//			FileInputStream fis = new FileInputStream(FILENAME);
-//			handler.ReadScores(fis);
-//			//fis.write(string.getBytes());
-//			fis.close();
-//		}
-//		catch(IOException e){
-//			e.printStackTrace();
-//		}
-//		
-//		boolean isScoreAdded = handler.AddScore(username, game_score);
-//		
-//		if(isScoreAdded == true){
-//			Toast.makeText(
-//					GameOverActivity.this,
-//					FILENAME + " saved",
-//				    Toast.LENGTH_LONG).show();
-//		}
-//		else{
-//			Toast.makeText(
-//					GameOverActivity.this,
-//					"Sorry! Your score is too low. You suck!",
-//				    Toast.LENGTH_LONG).show();
-//		}
-//		
-//		try{
-//			FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-//			handler.WriteScores(fos);
-//			fos.close();
-//		}
-//		catch(IOException e){
-//			e.printStackTrace();
-//		}
-//		
-//		ScoreObject[] scores = handler.GetHighScores();
+
 		Intent intent = new Intent (this, ScoreBoardActivity.class);
-//		int size = handler.GetSize();
-//		
-//		for (int i = 0; i < size; i++) {
-//			String name = "score_" + i;
-//		    intent.putExtra(name, scores[i]);
-//		}
-//		intent.putExtra("score_count", size);
+
 		startActivity(intent);
 	}
-//	
-//	public void onBackPressed(){
-//		//Nothing to do
-//		super.onBackPressed();
-//	}
-//	
-//	
+	
+	public void onBackPressed(){
+		//Nothing to do
+		super.onBackPressed();
+	}
+
 }

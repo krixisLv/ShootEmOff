@@ -1,15 +1,16 @@
 package com.shootemoff.game;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
-import com.shootemoff.framework.*;
+import com.shootemoff.framework.Audio;
+import com.shootemoff.framework.Game;
+import com.shootemoff.framework.Graphics;
 import com.shootemoff.framework.Input.KeyEvent;
 import com.shootemoff.framework.Input.TouchEvent;
-import com.shootemoff.framework.Pool.PoolObjectFactory;
-import com.shootemoff.framework.impl.*;
-
-
-import android.util.*;
+import com.shootemoff.framework.Sound;
 
 /* I should have used pools for my objects not to make garbage
  * collector angry. As it freezes the game sometimes, 
@@ -25,14 +26,16 @@ public class World
 	// list will never be resized.
 	public List<Dot> dots = new ArrayList<Dot>(DOTS_COUNT);
 	public Core core = new Core();
+	public ControlPad shieldControl = new ControlPad();
+	public ControlPad gunControl = new ControlPad();
 	public float offScreenRadius;
 	private final float SHIELD_HEALTH = 20.0F;
 	private final float CORE_HEALTH = 6.0F;
 	//private final int[] ALLOWED_ANGLES = {110, 330, 10, 180, 350, 300, 30, 200, -20, 100, 50, 320, 270};
 	private final int[] ALLOWED_ANGLES = {30, 200, -20, 100, 50, 320, 270, 0, 70, 340, 45, 20, 190, -80};
    	
-	public float shield_top_coef = (float)0.10;
-	public float shield_bottom_coef = (float)0.40;
+	public float shield_top_coef = (float)0.05;
+	public float shield_bottom_coef = (float)0.35;
 	public float shield_right_coef = (float)0.20;
 	public float shield_left_coef = (float)0.06;
 	
@@ -71,6 +74,15 @@ public class World
 		core.angle = 45.0F;
 		core.health = 1.0F;
 		core.shieldEnergy = 0.0F;
+		//Construct shield arc
+		shieldControl.angle = 45.0F;
+		shieldControl.coords = new VectorF( (float)(g.getWidth() * 0.13),(float)(g.getHeight() * 0.20) );
+		shieldControl.ARC_RADIUS = (float)(g.getHeight() * 0.15);
+		shieldControl.SHIELD_RADIUS = (float)(shieldControl.ARC_RADIUS * 0.9F);
+		//Construct gun arc
+		gunControl.coords = new VectorF( (float)(g.getWidth() * 0.13),(float)(g.getHeight() * 0.80) );
+		gunControl.ARC_RADIUS = (float)(g.getHeight() * 0.15);
+		gunControl.SHIELD_RADIUS = (float)(gunControl.ARC_RADIUS * 0.9F);
 		// Set offScreenRadius
 		offScreenRadius = (float) Math.hypot((double) g.getWidth() / 2,
 				(double) g.getHeight() / (float) 1.4);
@@ -162,7 +174,8 @@ public class World
 				float shield_pad_width = shield_bottom - shield_top;
 				float touchPoint = (float)((touchY - shield_top) / shield_pad_width);
 				
-				core.angle = (200 * touchPoint)+ 270;
+				core.angle = (270 - (200 * touchPoint)) + 200;
+				shieldControl.angle = core.angle;
 			}
 			else if(false){
 				//shooting sphere controls

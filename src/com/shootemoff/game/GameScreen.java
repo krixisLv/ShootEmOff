@@ -23,13 +23,18 @@ public class GameScreen extends Screen
 
 	Paint paint = new Paint();
 	RectF rect = new RectF();
-
+	RectF shield_pad_rect = new RectF();
+	RectF gun_pad_rect = new RectF();
+	
 	GradientDrawable gradient;
 
 	Context r;
 	
 	int mainCoreColor = 0xff0f4915;
 	int enemyDotColor = 0xff000000;
+	int shieldControlColor = 0x801b8e26;
+	int shieldControlShieldColor = 0xee000000;
+	int gunControlColor = 0x80727673;
         
     public GameScreen(GameActivity game)
     {
@@ -42,14 +47,19 @@ public class GameScreen extends Screen
 		rect.left = world.core.coords.x - world.core.shieldRadius;
 		rect.bottom = world.core.coords.y + world.core.shieldRadius;
 		rect.right = world.core.coords.x + world.core.shieldRadius;
+		
+		shield_pad_rect.top = world.shieldControl.coords.y - world.shieldControl.ARC_RADIUS;
+		shield_pad_rect.left = world.shieldControl.coords.x - world.shieldControl.ARC_RADIUS;
+		shield_pad_rect.bottom = world.shieldControl.coords.y + world.shieldControl.ARC_RADIUS;
+		shield_pad_rect.right = world.shieldControl.coords.x + world.shieldControl.ARC_RADIUS;
+		
+		gun_pad_rect.top = world.gunControl.coords.y - world.gunControl.ARC_RADIUS;
+		gun_pad_rect.left = world.gunControl.coords.x - world.gunControl.ARC_RADIUS;
+		gun_pad_rect.bottom = world.gunControl.coords.y + world.gunControl.ARC_RADIUS;
+		gun_pad_rect.right = world.gunControl.coords.x + world.gunControl.ARC_RADIUS;
 
 		paint.setAntiAlias(true);
 		paint.setStrokeWidth(0.0F);
-		
-		/* This is the background red gradient
-		gradient = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-				new int[]{0xff410a0a, 0xff6c0b0b});
-				*/
 		
 		gradient = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
 				new int[]{0xffc2c2c2, 0xffb1b1b1, 0xff949494, 0xff727272, 0xff5c5c5c,});
@@ -99,6 +109,23 @@ public class GameScreen extends Screen
 		paint.setStrokeWidth(0.0F);
 		paint.setStyle(Paint.Style.FILL_AND_STROKE);
 		
+		//draw shield control arc
+		paint.setColor(shieldControlColor);
+		c.drawArc(shield_pad_rect, -90,
+				180, true, paint);
+		paint.setStyle(Paint.Style.STROKE);
+		paint.setStrokeWidth(ControlPad.SHIELD_WIDTH);
+		paint.setColor(shieldControlShieldColor);
+		c.drawArc(shield_pad_rect, (360.0F - world.shieldControl.angle),
+				(360.0F - world.shieldControl.GAP_ANGLE), false, paint);
+		paint.setStrokeWidth(0.0F);
+		
+		//draw gun control arc
+		paint.setStyle(Paint.Style.FILL_AND_STROKE);
+		paint.setColor(gunControlColor);
+		c.drawArc(gun_pad_rect, -90,
+				180, true, paint);
+		paint.setStyle(Paint.Style.STROKE);
 		
 		Graphics g = world.game.getGraphics();
 		float screenWidth = (float) g.getWidth();
@@ -110,14 +137,14 @@ public class GameScreen extends Screen
 	   	shieldControl.right = world.shield_right = (float) (screenWidth * world.shield_right_coef);
 	   	shieldControl.left = world.shield_left = (float) (screenWidth * world.shield_left_coef);
 	   	
-	   	//draw control pad
-	   	paint.setColor(0x44ffffff);
-		c.drawRoundRect(shieldControl, 15, 15, paint);
-		//draw control pad border
-		paint.setStyle(Paint.Style.STROKE);
-		paint.setStrokeWidth(3.0F);
-		paint.setColor(0xff111111);
-		c.drawRoundRect(shieldControl, 15, 15, paint);
+//	   	//draw control pad
+//	   	paint.setColor(0x44ffffff);
+//		c.drawRoundRect(shieldControl, 15, 15, paint);
+//		//draw control pad border
+//		paint.setStyle(Paint.Style.STROKE);
+//		paint.setStrokeWidth(3.0F);
+//		paint.setColor(0xff111111);
+//		c.drawRoundRect(shieldControl, 15, 15, paint);
 		
 		//color the dots
 		paint.setStyle(Paint.Style.FILL_AND_STROKE);

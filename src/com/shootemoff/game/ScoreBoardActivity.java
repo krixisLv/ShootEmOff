@@ -41,9 +41,9 @@ public class ScoreBoardActivity extends Activity {
 		String max_scores_saved_string = res.getString(R.string.max_scores_saved);
 		int max_scores_saved = Integer.parseInt(max_scores_saved_string);
 		for(int i = 0; i < max_scores_saved; i++){
-			//String  score1 = sharedPref.getString(scores[i], defaultValueString);
+
 			int score = sharedPref.getInt(scores[i], defaultValue);
-			//int score = Integer.parseInt(score1);
+
 			if(score != defaultValue){
 				String name = sharedPref.getString(score_names[i], defaultName);
 				handler.AddScore(name, score);
@@ -57,24 +57,18 @@ public class ScoreBoardActivity extends Activity {
 		int size = handler.GetSize();
 		ListView scoreListView = (ListView)findViewById(R.id.list);
 		String[] scoreArray = new String[size];
-//		
-//		if(size > 0){
-//			text.setText("there is some score!");
-//		}
-		
 
-		
 		ScoreObject[] scores_from_file = handler.GetHighScores();
 		
 		for(int i = 0; i < size; i++){
 			String score_line;
 			if(scores_from_file[i].score < 100){
-				score_line = "NAME : " + scores_from_file[i].name + " SCORE : " + scores_from_file[i].score ;
+				score_line = "NAME : " + scores_from_file[i].name + "\t\t SCORE : 0:" + scores_from_file[i].score ;
 			}
 			else{
 				int minutes = (scores_from_file[i].score / 100);
 				int seconds = scores_from_file[i].score - (minutes * 100);
-				score_line = "NAME : " + scores_from_file[i].name + " SCORE : " + minutes + ":" + seconds;
+				score_line = "NAME : " + scores_from_file[i].name + "\t\t SCORE : " + minutes + ":" + seconds;
 			}
 			scoreArray[i] = score_line;
 		}
@@ -88,17 +82,6 @@ public class ScoreBoardActivity extends Activity {
 	    
 	    scoreListView.setAdapter( listAdapter );
 	    
-//		SavedFiles = getApplicationContext().fileList();
-//		   ArrayAdapter<String> adapter
-//		   = new ArrayAdapter<String>(this,
-//		     android.R.layout.simple_list_item_1,
-//		     SavedFiles);
-//
-//	   listSavedFiles.setAdapter(adapter);
-//	   
-//	   if(SavedFiles.length > 0){
-//		   text.setText("1");
-//	   }
 	}
 
 	@Override
