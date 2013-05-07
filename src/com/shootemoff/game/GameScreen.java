@@ -30,11 +30,13 @@ public class GameScreen extends Screen
 
 	Context r;
 	
+	int healthColor = 0xff429E4C;
 	int mainCoreColor = 0xff0f4915;
 	int enemyDotColor = 0xff000000;
 	int shieldControlColor = 0x801b8e26;
 	int shieldControlShieldColor = 0xee000000;
 	int gunControlColor = 0x80727673;
+	int gunshotColor = 0xffFF000D;
         
     public GameScreen(GameActivity game)
     {
@@ -43,6 +45,7 @@ public class GameScreen extends Screen
 		r = (Context) game;
 		world = new World(game);	
 		world.renew();
+		world.gameOn.play(50);
 		rect.top = world.core.coords.y - world.core.shieldRadius;
 		rect.left = world.core.coords.x - world.core.shieldRadius;
 		rect.bottom = world.core.coords.y + world.core.shieldRadius;
@@ -131,12 +134,22 @@ public class GameScreen extends Screen
 		float screenWidth = (float) g.getWidth();
 	   	float screenHeight = (float) g.getHeight();
 	   	
-	   	RectF shieldControl = new RectF();
-	   	shieldControl.top = world.shield_top = (float) (screenHeight * world.shield_top_coef);
-	   	shieldControl.bottom = world.shield_bottom = (float) (screenHeight * world.shield_bottom_coef);
-	   	shieldControl.right = world.shield_right = (float) (screenWidth * world.shield_right_coef);
-	   	shieldControl.left = world.shield_left = (float) (screenWidth * world.shield_left_coef);
+	   	//set shield control rectangle for touch area
+	   	world.shield_top = (float) (screenHeight * world.shield_top_coef);
+	   	world.shield_bottom = (float) (screenHeight * world.shield_bottom_coef);
+	   	world.shield_right = (float) (screenWidth * world.shield_right_coef);
+	   	world.shield_left = (float) (screenWidth * world.shield_left_coef);
+	  //set gun control rectangle for touch area
+	   	world.gun_top = (float) (screenHeight * world.gun_top_coef);
+	   	world.gun_bottom = (float) (screenHeight * world.gun_bottom_coef);
+	   	world.gun_right = (float) (screenWidth * world.gun_right_coef);
+	   	world.gun_left = (float) (screenWidth * world.gun_left_coef);
 	   	
+//	   	RectF shieldControl = new RectF();
+//	   	shieldControl.top = world.shield_top = (float) (screenHeight * world.shield_top_coef);
+//	   	shieldControl.bottom = world.shield_bottom = (float) (screenHeight * world.shield_bottom_coef);
+//	   	shieldControl.right = world.shield_right = (float) (screenWidth * world.shield_right_coef);
+//	   	shieldControl.left = world.shield_left = (float) (screenWidth * world.shield_left_coef);
 //	   	//draw control pad
 //	   	paint.setColor(0x44ffffff);
 //		c.drawRoundRect(shieldControl, 15, 15, paint);
@@ -154,15 +167,27 @@ public class GameScreen extends Screen
 		{
 			int color = 0;
 			Dot dot = iterator.next();
-			if(dot.type == Dot.Type.Enemy)
+			if(dot.type == Dot.Type.Enemy){
 				color = enemyDotColor;
-			else if(dot.type == Dot.Type.Health)
-				color = mainCoreColor;//main core color
+			}
+			else if(dot.type == Dot.Type.Health){
+				color = healthColor;
+			}
 
 			paint.setColor(color);
 			c.drawCircle(dot.coords.x, dot.coords.y,
 					dot.maxRadius * dot.energy, paint);
 	    }
+		
+		iterator = world.shots.iterator();
+		while(iterator.hasNext()){
+			int color = 0;
+			Dot dot = iterator.next();
+			color = gunshotColor;//main core color
+			paint.setColor(color);
+			c.drawCircle(dot.coords.x, dot.coords.y,
+					dot.maxRadius * dot.energy, paint);
+		}
 	
 		if(world.state == World.GameState.Running)
 			drawMessage(world.getTime(), c);

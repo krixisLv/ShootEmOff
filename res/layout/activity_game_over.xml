@@ -14,24 +14,14 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginRight="111dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/hello_world" />
+        android:layout_marginTop="32dp"/>
 
     <TextView
         android:id="@+id/game_over_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="34dp"
-        android:text="@string/hello_world" />
-
-    <Button
-        android:id="@+id/submit_score"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="120dp"
-        android:onClick="StoreScore"
-        android:text="@string/save_score" />
+        android:text="@string/game_over" />
 
     <EditText
         android:id="@+id/username"
@@ -45,5 +35,14 @@
 
         <requestFocus />
     </EditText>
+
+    <Button
+        android:id="@+id/submit_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/username"
+        android:layout_toRightOf="@+id/username"
+        android:onClick="StoreScore"
+        android:text="@string/save_score" />
 
 </RelativeLayout>

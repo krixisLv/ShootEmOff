@@ -62,14 +62,28 @@ public class ScoreBoardActivity extends Activity {
 		
 		for(int i = 0; i < size; i++){
 			String score_line;
-			if(scores_from_file[i].score < 100){
-				score_line = "NAME : " + scores_from_file[i].name + "\t\t SCORE : 0:" + scores_from_file[i].score ;
+			
+			int minutes = (scores_from_file[i].score / 100);
+			int seconds = scores_from_file[i].score - (minutes * 100);
+			score_line = "NAME : " + scores_from_file[i].name + "\t\t\t SCORE : ";
+			
+			if(minutes < 10){
+				score_line += "0";
 			}
-			else{
-				int minutes = (scores_from_file[i].score / 100);
-				int seconds = scores_from_file[i].score - (minutes * 100);
-				score_line = "NAME : " + scores_from_file[i].name + "\t\t SCORE : " + minutes + ":" + seconds;
+			score_line += minutes + ":";
+			if(seconds < 10){
+				score_line += "0";
 			}
+			score_line += seconds;
+			
+//			if(scores_from_file[i].score < 100){
+//				score_line = "NAME : " + scores_from_file[i].name + "\t\t SCORE : 0:" + scores_from_file[i].score ;
+//			}
+//			else{
+//				int minutes = (scores_from_file[i].score / 100);
+//				int seconds = scores_from_file[i].score - (minutes * 100);
+//				score_line = "NAME : " + scores_from_file[i].name + "\t\t SCORE : " + minutes + ":" + seconds;
+//			}
 			scoreArray[i] = score_line;
 		}
 		
@@ -98,8 +112,9 @@ public class ScoreBoardActivity extends Activity {
 	}
 	
 	public void onBackPressed(){
-		//Nothing to do
-		super.onBackPressed();
+		//super.onBackPressed();
+		Intent intent = new Intent (this, StartScreenActivity.class);
+		startActivity(intent);
 	}
 
 }

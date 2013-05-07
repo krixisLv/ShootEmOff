@@ -58,4 +58,10 @@ public class VectorF extends PointF
 		this.x -= vector.x;
 		this.y -= vector.y;
 	}
+	
+	public void subtractFromThis(float x, float y)
+	{
+		this.x -= x;
+		this.y -= y;
+	}
 }

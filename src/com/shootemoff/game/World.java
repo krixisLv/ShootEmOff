@@ -3,6 +3,7 @@ package com.shootemoff.game;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Random;
 
 import com.shootemoff.framework.Audio;
@@ -21,10 +22,14 @@ public class World
 {
 	Random random = new Random();
 	Game game;
-	private final int DOTS_COUNT = 10;
+	private final int DOTS_COUNT = 15;
+	private final int GUN_SHOTS_COUNT = 10;
 	// In this case ArrayList is better than LinkedList:
 	// list will never be resized.
 	public List<Dot> dots = new ArrayList<Dot>(DOTS_COUNT);
+	
+	public List<Dot> shots = new ArrayList<Dot>(GUN_SHOTS_COUNT);
+	
 	public Core core = new Core();
 	public ControlPad shieldControl = new ControlPad();
 	public ControlPad gunControl = new ControlPad();
@@ -34,17 +39,26 @@ public class World
 	//private final int[] ALLOWED_ANGLES = {110, 330, 10, 180, 350, 300, 30, 200, -20, 100, 50, 320, 270};
 	private final int[] ALLOWED_ANGLES = {30, 200, -20, 100, 50, 320, 270, 0, 70, 340, 45, 20, 190, -80};
    	
-	public float shield_top_coef = (float)0.05;
-	public float shield_bottom_coef = (float)0.35;
-	public float shield_right_coef = (float)0.20;
+	public float shield_top_coef = (float)0.65;//0.05;
+	public float shield_bottom_coef = (float)0.95;//0.35;
+	public float shield_right_coef = (float)0.30;
 	public float shield_left_coef = (float)0.06;
-	
 	public float shield_top;
 	public float shield_bottom;
 	public float shield_right;
 	public float shield_left;
+	
+	public float gun_top_coef = (float)0.05;//0.65;
+	public float gun_bottom_coef = (float)0.35;//0.95;
+	public float gun_right_coef = (float)0.30;
+	public float gun_left_coef = (float)0.06;
+	public float gun_top;
+	public float gun_bottom;
+	public float gun_right;
+	public float gun_left;
 
 	private float time = 0.0F; // in seconds
+	private float last_shot_time = 0.0F;
 
 	public enum GameState {Ready, Running, Paused, GameOver}
 
@@ -61,6 +75,10 @@ public class World
 	Sound shieldCollision;
 
 	Sound gameOver;
+	Sound gunShot;
+	Sound shieldMove;
+	Sound gunShotCollision;
+	Sound gameOn;
 
 	public World(Game game)
 	{
@@ -76,11 +94,11 @@ public class World
 		core.shieldEnergy = 0.0F;
 		//Construct shield arc
 		shieldControl.angle = 45.0F;
-		shieldControl.coords = new VectorF( (float)(g.getWidth() * 0.13),(float)(g.getHeight() * 0.20) );
+		shieldControl.coords = new VectorF( (float)(g.getWidth() * 0.13),(float)(g.getHeight() * 0.80) );
 		shieldControl.ARC_RADIUS = (float)(g.getHeight() * 0.15);
 		shieldControl.SHIELD_RADIUS = (float)(shieldControl.ARC_RADIUS * 0.9F);
 		//Construct gun arc
-		gunControl.coords = new VectorF( (float)(g.getWidth() * 0.13),(float)(g.getHeight() * 0.80) );
+		gunControl.coords = new VectorF( (float)(g.getWidth() * 0.13),(float)(g.getHeight() * 0.20) );
 		gunControl.ARC_RADIUS = (float)(g.getHeight() * 0.15);
 		gunControl.SHIELD_RADIUS = (float)(gunControl.ARC_RADIUS * 0.9F);
 		// Set offScreenRadius
@@ -97,8 +115,12 @@ public class World
 		coreHurt = a.newSound("core_hurt.wav");
 		coreHealth = a.newSound("core_health.wav");
 		coreShield = a.newSound("core_shield.wav");
-		shieldCollision = a.newSound("shield_collision.wav");
+		shieldCollision = a.newSound("clash_02.wav");
 		gameOver = a.newSound("game_over.wav");
+		gunShot = a.newSound("laser_shot.wav");
+		shieldMove = a.newSound("shield_move.wav");
+		gunShotCollision = a.newSound("clash_01.wav");
+		gameOn = a.newSound("saber_on.wav");
 	}
 
 	// Restart the game	
@@ -108,6 +130,7 @@ public class World
 		core.health = 1.0F;
 		core.shieldEnergy = 0.0F;
 		time = 0.0F;
+		last_shot_time = 0.0F;
 		state = GameState.Ready;
 		difficulty = 0.04F;
 		generateStartDots(DOTS_COUNT);
@@ -151,23 +174,10 @@ public class World
 	{
 		if(game.getInput().isTouchDown())
 		{
-			//shield pad controls
+			
 			double touchX = (double) game.getInput().getTouchX();
 			double touchY = (double) game.getInput().getTouchY();
-			
-//			if(touchX >= shield_left && touchX <= shield_right &&
-//					touchY >= shield_top && touchY <= shield_bottom){
-//				
-//				float shield_pad_width = shield_right - shield_left;
-//				float touchPoint = (float)((touchX - shield_left) / shield_pad_width);
-//				//need to calculate appropriate angles for the shield and then bind them with the control pad
-//				
-//				int angleSign = ((0.5 - touchPoint) > 0 )? 1 : -1;
-//				
-//				//min 50 max 180
-//				core.angle = ((110) * angleSign * touchPoint);
-//				
-//			}
+			//shield pad controls
 			if(touchY >= shield_left && touchX <= shield_right &&
 					touchY >= shield_top && touchY <= shield_bottom){
 				
@@ -176,10 +186,27 @@ public class World
 				
 				core.angle = (270 - (200 * touchPoint)) + 200;
 				shieldControl.angle = core.angle;
+				shieldMove.play(20);
 			}
-			else if(false){
-				//shooting sphere controls
-				//gun shot angle
+			else if(touchY >= gun_left && touchX <= gun_right &&
+					touchY >= gun_top && touchY <= gun_bottom){
+
+				double shot_offset = (int)(time - last_shot_time);
+				if(shots.size() < GUN_SHOTS_COUNT && shot_offset > 0.5){
+					
+					float gun_pad_width = gun_bottom - gun_top;
+					float touchPoint = (float)((touchY - gun_top) / gun_pad_width);
+					double angle = (270 - (200 * touchPoint)) + 200 + 90;
+					double radians = Math.toRadians(angle);
+					
+					float current_radius = core.maxRadius * core.health;
+					double x_coord = core.coords.x + (Math.sin(radians) * current_radius);
+					double y_coord = core.coords.y + (Math.cos(radians) * current_radius);
+					
+					last_shot_time = time;
+					gunShot.play(40);
+					generateNewGunShot(x_coord, y_coord, radians);
+				}
 				/*
 					// Y-axis is inverted. See checkCollisionWithShield(...)
 					// method
@@ -246,8 +273,10 @@ public class World
 
 		generateNewDots(DOTS_COUNT);
 
+		handleShotPositions();
 		handleCollisions();
 		moveDots(deltaTime);
+		moveShots(deltaTime);
 		decreaseShieldEnergy(deltaTime);
 	}
 
@@ -270,6 +299,25 @@ public class World
 	private void increaseDifficulty()
 	{
 		difficulty += 0.00005F;
+	}
+	
+	private void generateNewGunShot(double x, double y, double radians)
+	{
+		float linearSpeed = 10.0F * difficulty;
+		Dot gun_shot = new Dot();
+		
+		gun_shot.coords = new VectorF((float)x, (float)y);
+		
+		gun_shot.angle_radians = radians;
+		
+		VectorF speed  = new VectorF(linearSpeed, linearSpeed);
+		gun_shot.speed = speed;
+		gun_shot.energy = 1.0F;
+		//gun_shot.coords.subtractFromThis(core.coords);
+		//gun_shot.coords = generateNewDotCoordsInRandomPlace();
+		gun_shot.type = Dot.Type.Gunshot;
+		
+		shots.add(gun_shot);
 	}
 
 	private void generateNewDot(boolean atStart)
@@ -334,12 +382,57 @@ public class World
 		
 		return coords;
 	}
+	
+	private void moveShots(float deltaTime)
+	{
+		for(Dot dot : shots)
+		{
+			dot.coords.addToThis((float)(dot.speed.x * deltaTime * 100.0F * Math.sin(dot.angle_radians)),
+					(float)(dot.speed.y * deltaTime * 100.0F * Math.cos(dot.angle_radians)));
+			
+			
+		}
+	}
+	
 	private void moveDots(float deltaTime)
 	{
 		for(Dot dot : dots)
 		{
 			dot.coords.addToThis(dot.speed.x * deltaTime * 100.0F,
 					dot.speed.y * deltaTime * 100.0F);
+		}
+	}
+	
+	private void handleShotPositions()
+	{
+		Iterator<Dot> iterator = shots.iterator();
+		while(iterator.hasNext())
+		{
+			handleShotPosition(iterator.next(), iterator);
+		}
+	}
+	
+	private void handleShotPosition(Dot shot, Iterator<Dot> iterator)
+	{
+//		float lengthToCoreCenter = (float)Math.hypot(
+//				(double)(shot.coords.x - core.coords.x),
+//				(double)(shot.coords.y - core.coords.y));
+		
+		Graphics g = game.getGraphics();
+		if(shot.coords.x < 0 || shot.coords.y < 0 || shot.coords.x > g.getWidth() || shot.coords.x > g.getHeight()){
+			iterator.remove();
+		}
+	}
+	
+	private void handleShotCollision(Dot shot, Iterator<Dot> shot_iterator, Dot dot, Iterator<Dot> dot_iterator)
+	{
+		if(Math.abs(shot.coords.x - dot.coords.x) <= Dot.maxRadius &&
+				Math.abs(shot.coords.y - dot.coords.y) <= Dot.maxRadius){
+			
+			shot_iterator.remove();
+			dot_iterator.remove();
+			gunShotCollision.play(40);
+			game.getVibration().vibrate(30);
 		}
 	}
 
@@ -354,18 +447,33 @@ public class World
 
 	private void handleCollision(Dot dot, Iterator<Dot> iterator)
 	{
-		float lengthToCoreCenter = (float)
-			Math.hypot((double)(dot.coords.x - core.coords.x),
-					(double)(dot.coords.y - core.coords.y)); 
+		float lengthToCoreCenter = (float)Math.hypot(
+				(double)(dot.coords.x - core.coords.x),
+				(double)(dot.coords.y - core.coords.y)); 
 		
 		if(Math.abs(lengthToCoreCenter - 
 					core.shieldRadius) <= dot.maxRadius * dot.energy +
 				Core.SHIELD_WIDTH)
+		{
 			checkCollisionWithShield(dot, iterator);
-		
+		}
 		else if (lengthToCoreCenter - core.maxRadius * core.health <=
-			   	dot.maxRadius * dot.energy)
+			   	Dot.maxRadius * dot.energy){
 			handleCollisionWithCore(dot, iterator);
+		}
+		else{
+			try{
+				if(shots.size() > 0 && dot.type == Dot.Type.Enemy){
+					Iterator<Dot> shot_iterator = shots.iterator();
+					while(shot_iterator.hasNext()){
+						handleShotCollision(shot_iterator.next(), shot_iterator, dot, iterator);
+					}
+				}
+			}
+			catch(NoSuchElementException e){
+				// just sit this one out
+			}
+		}
 	}
 
 	private void checkCollisionWithShield(Dot dot, Iterator<Dot> iterator)
@@ -400,7 +508,7 @@ public class World
 		{
 			iterator.remove();
 			shieldCollision.play(dot.energy);
-			game.getVibration().vibrate(30);
+			game.getVibration().vibrate(40);
 		}
 		}
 	}

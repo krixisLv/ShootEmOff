@@ -31,8 +31,16 @@ public class GameOverActivity extends Activity
 		game_score = Integer.parseInt(score_string);
 		
 		TextView t = (TextView)findViewById(R.id.game_score); 
-		t.setText(score_string);
+		//format score into time
+		int minutes = game_score/100;
+		int seconds = game_score - (100 * minutes);
+		score_string = minutes + ":";
+		if(seconds < 10){
+			score_string += "0";
+		}
+		score_string += seconds;
 		
+		t.setText(score_string);
 	}
 
 	@Override

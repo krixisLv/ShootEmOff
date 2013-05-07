@@ -3,7 +3,7 @@
 
     <string name="app_name">ShootEmOff</string>
     <string name="paused">Game is paused.\nTouch the screen\nto resume.</string>
-    <string name="game_over">It`s over!\nTAP ME to restart.</string>
+    <string name="game_over">It`s over! Enter your username and save!</string>
     <string name="your_time">Best you got:</string>
     <string name="game_url">Shoot `Em Down</string>
     <string name="title_activity_start_screen">StartScreenActivity</string>
@@ -23,7 +23,7 @@
     <string name="saved_score_name_default">default name</string>
     <string name="max_scores_saved">10</string>
     <string name="back_to_menu">Back to menu</string>
-    <string name="save_score">Save</string>
+    <string name="save_score">Save your score</string>
     <string name="username_hint">Enter username</string>
     
     <string-array name="scores_array">
