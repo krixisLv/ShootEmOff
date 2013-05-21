@@ -11,7 +11,6 @@ import android.graphics.drawable.GradientDrawable;
 
 import com.shootemoff.framework.Graphics;
 import com.shootemoff.framework.Screen;
-import com.shootemoff.shootemoffgame.R;
 
 
 public class GameScreen extends Screen 
@@ -43,7 +42,7 @@ public class GameScreen extends Screen
     	super(game);
     	gActivity = game;
 		r = (Context) game;
-		world = new World(game);	
+		world = new World(game, game.getResources().getConfiguration().screenLayout);	
 		world.renew();
 		world.gameOn.play(50);
 		rect.top = world.core.coords.y - world.core.shieldRadius;
@@ -145,19 +144,12 @@ public class GameScreen extends Screen
 	   	world.gun_right = (float) (screenWidth * world.gun_right_coef);
 	   	world.gun_left = (float) (screenWidth * world.gun_left_coef);
 	   	
-//	   	RectF shieldControl = new RectF();
-//	   	shieldControl.top = world.shield_top = (float) (screenHeight * world.shield_top_coef);
-//	   	shieldControl.bottom = world.shield_bottom = (float) (screenHeight * world.shield_bottom_coef);
-//	   	shieldControl.right = world.shield_right = (float) (screenWidth * world.shield_right_coef);
-//	   	shieldControl.left = world.shield_left = (float) (screenWidth * world.shield_left_coef);
-//	   	//draw control pad
-//	   	paint.setColor(0x44ffffff);
-//		c.drawRoundRect(shieldControl, 15, 15, paint);
-//		//draw control pad border
-//		paint.setStyle(Paint.Style.STROKE);
-//		paint.setStrokeWidth(3.0F);
-//		paint.setColor(0xff111111);
-//		c.drawRoundRect(shieldControl, 15, 15, paint);
+	   	if(world.just_aimed == true){
+	   		paint.setStrokeWidth(1.0F);
+	   		int color = gunshotColor;
+			paint.setColor(color);
+	   		c.drawLine(world.core.coords.x, world.core.coords.y, world.aim_beam.x, world.aim_beam.y, paint);
+	   	}
 		
 		//color the dots
 		paint.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -183,7 +175,7 @@ public class GameScreen extends Screen
 		while(iterator.hasNext()){
 			int color = 0;
 			Dot dot = iterator.next();
-			color = gunshotColor;//main core color
+			color = gunshotColor;
 			paint.setColor(color);
 			c.drawCircle(dot.coords.x, dot.coords.y,
 					dot.maxRadius * dot.energy, paint);

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
+import android.content.res.Configuration;
+
 import com.shootemoff.framework.Audio;
 import com.shootemoff.framework.Game;
 import com.shootemoff.framework.Graphics;
@@ -39,6 +41,10 @@ public class World
 	//private final int[] ALLOWED_ANGLES = {110, 330, 10, 180, 350, 300, 30, 200, -20, 100, 50, 320, 270};
 	private final int[] ALLOWED_ANGLES = {30, 200, -20, 100, 50, 320, 270, 0, 70, 340, 45, 20, 190, -80};
    	
+	public boolean just_aimed = false;
+	public double aim_angle;
+	public VectorF aim_beam;
+	
 	public float shield_top_coef = (float)0.65;//0.05;
 	public float shield_bottom_coef = (float)0.95;//0.35;
 	public float shield_right_coef = (float)0.30;
@@ -56,7 +62,10 @@ public class World
 	public float gun_bottom;
 	public float gun_right;
 	public float gun_left;
-
+	
+	//default base speed
+	float base_speed;
+	
 	private float time = 0.0F; // in seconds
 	private float last_shot_time = 0.0F;
 
@@ -80,10 +89,11 @@ public class World
 	Sound gunShotCollision;
 	Sound gameOn;
 
-	public World(Game game)
+	public World(Game game, int screen_layout)
 	{
 		this.game = game;
 		Graphics g = game.getGraphics();
+		
 		// Construct core
 		core.coords = new VectorF((float) g.getWidth() / 4,
 			   	(float) g.getHeight() / (float) 2);
@@ -92,23 +102,68 @@ public class World
 		core.angle = 45.0F;
 		core.health = 1.0F;
 		core.shieldEnergy = 0.0F;
+		
 		//Construct shield arc
 		shieldControl.angle = 45.0F;
 		shieldControl.coords = new VectorF( (float)(g.getWidth() * 0.13),(float)(g.getHeight() * 0.80) );
 		shieldControl.ARC_RADIUS = (float)(g.getHeight() * 0.15);
 		shieldControl.SHIELD_RADIUS = (float)(shieldControl.ARC_RADIUS * 0.9F);
+		
 		//Construct gun arc
 		gunControl.coords = new VectorF( (float)(g.getWidth() * 0.13),(float)(g.getHeight() * 0.20) );
 		gunControl.ARC_RADIUS = (float)(g.getHeight() * 0.15);
 		gunControl.SHIELD_RADIUS = (float)(gunControl.ARC_RADIUS * 0.9F);
+		
 		// Set offScreenRadius
 		offScreenRadius = (float) Math.hypot((double) g.getWidth() / 2,
 				(double) g.getHeight() / (float) 1.4);
+		
 		// Max dot radius (when it's energy is 1.0F)
 		Dot.maxRadius = core.maxRadius / 8.0F;
+		
+		DetermineBaseSpeed(screen_layout);
 		loadSounds();
 	}
-
+	
+	//return 1-small, 2-normal, 3-large, 2-other sizes
+	private int DetermineScreenSize(int screen_layout)
+	{
+		int screen_size;
+		if ( (screen_layout & Configuration.SCREENLAYOUT_SIZE_MASK ) == Configuration.SCREENLAYOUT_SIZE_LARGE ) {     
+	        screen_size = 3;
+	    }
+	    else if ( (screen_layout & Configuration.SCREENLAYOUT_SIZE_MASK ) == Configuration.SCREENLAYOUT_SIZE_NORMAL ) {     
+	    	screen_size = 2;
+	    } 
+	    else if ( (screen_layout & Configuration.SCREENLAYOUT_SIZE_MASK ) == Configuration.SCREENLAYOUT_SIZE_SMALL ) {     
+	    	screen_size = 1;
+	    }
+	    else {
+	    	screen_size = 2;
+	    }
+		
+		return screen_size;
+	}
+	
+	private void DetermineBaseSpeed(int screen_layout)
+	{
+		int screen_size = DetermineScreenSize(screen_layout);
+		switch(screen_size){
+			case 1:
+				this.base_speed = 5F;
+				break;
+			case 2:
+				this.base_speed = 10F;
+				break;
+			case 3:
+				this.base_speed = 15F;
+				break;
+			default:
+				this.base_speed = 10F;
+		}
+		
+	}
+	
 	private void loadSounds()
 	{
 		Audio a = game.getAudio();
@@ -172,8 +227,7 @@ public class World
 
 	private void doInput()
 	{
-		if(game.getInput().isTouchDown())
-		{
+		if(game.getInput().isTouchDown()){
 			
 			double touchX = (double) game.getInput().getTouchX();
 			double touchY = (double) game.getInput().getTouchY();
@@ -188,24 +242,23 @@ public class World
 				shieldControl.angle = core.angle;
 				shieldMove.play(20);
 			}
-			else if(touchY >= gun_left && touchX <= gun_right &&
-					touchY >= gun_top && touchY <= gun_bottom){
+			else if( touchY >= gun_left && touchX <= gun_right &&
+						touchY >= gun_top && touchY <= gun_bottom ){
 
-				double shot_offset = (int)(time - last_shot_time);
-				if(shots.size() < GUN_SHOTS_COUNT && shot_offset > 0.5){
+				//double shot_offset = (int)(time - last_shot_time);
+				if(shots.size() < GUN_SHOTS_COUNT){
 					
 					float gun_pad_width = gun_bottom - gun_top;
 					float touchPoint = (float)((touchY - gun_top) / gun_pad_width);
-					double angle = (270 - (200 * touchPoint)) + 200 + 90;
-					double radians = Math.toRadians(angle);
+					aim_angle = (270 - (200 * touchPoint)) + 200 + 90;
+					double radians = Math.toRadians(aim_angle);
 					
-					float current_radius = core.maxRadius * core.health;
+					float current_radius = core.maxRadius * 3;
 					double x_coord = core.coords.x + (Math.sin(radians) * current_radius);
 					double y_coord = core.coords.y + (Math.cos(radians) * current_radius);
-					
+					aim_beam = new VectorF((float)x_coord, (float)y_coord);
+					just_aimed = true;
 					last_shot_time = time;
-					gunShot.play(40);
-					generateNewGunShot(x_coord, y_coord, radians);
 				}
 				/*
 					// Y-axis is inverted. See checkCollisionWithShield(...)
@@ -216,6 +269,19 @@ public class World
 				*/
 			}
 		}
+		//remember the aiming angle and sheooooouut...
+		if(just_aimed == true && last_shot_time < time){
+			double radians = Math.toRadians(aim_angle);
+			
+			float current_radius = core.maxRadius * core.health;
+			double x_coord = core.coords.x + (Math.sin(radians) * current_radius);
+			double y_coord = core.coords.y + (Math.cos(radians) * current_radius);
+			
+			gunShot.play(40);
+			generateNewGunShot(x_coord, y_coord, radians);
+			just_aimed = false;
+		}
+		
 	}
 
 	private void updateReady(float deltaTime)
@@ -303,7 +369,7 @@ public class World
 	
 	private void generateNewGunShot(double x, double y, double radians)
 	{
-		float linearSpeed = 10.0F * difficulty;
+		float linearSpeed = this.base_speed * difficulty;
 		Dot gun_shot = new Dot();
 		
 		gun_shot.coords = new VectorF((float)x, (float)y);
@@ -322,7 +388,7 @@ public class World
 
 	private void generateNewDot(boolean atStart)
 	{
-		float linearSpeed = 10.0F * difficulty;
+		float linearSpeed = this.base_speed * difficulty;
 		Dot dot = new Dot();
 		if(atStart)
 		{
