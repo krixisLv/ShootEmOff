@@ -18,8 +18,11 @@ Game base built with code from <a href="https://github.com/o2genum/CoreGame">Cor
 
 Preview:
 ==========
-<img src="https://raw.github.com/krixisLv/ShootEmOff/master/screenshots/screenshot3.png" width="32.5%"> &nbsp;
-<img src="https://raw.github.com/krixisLv/ShootEmOff/master/screenshots/screenshot4.png" width="32.5%"> &nbsp;
+<img src="https://raw.github.com/krixisLv/ShootEmOff/master/screenshots/Screenshot_2013-05-30-00-12-56.png" width="32.5%"> &nbsp;
+<img src="https://raw.github.com/krixisLv/ShootEmOff/master/screenshots/Screenshot_2013-05-30-00-13-03.png" width="32.5%"> &nbsp;
+</br>
+<img src="https://raw.github.com/krixisLv/ShootEmOff/master/screenshots/Screenshot_2013-05-30-00-13-09.png" width="32.5%"> &nbsp;
+<img src="https://raw.github.com/krixisLv/ShootEmOff/master/screenshots/Screenshot_2013-05-30-00-13-17.png" width="32.5%"> &nbsp;
 
 License:
 ==========
