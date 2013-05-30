@@ -1,7 +1,5 @@
 package com.shootemoff.game;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -10,10 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -30,8 +31,6 @@ public class ScoreBoardActivity extends Activity {
 		String[] scores = res.getStringArray(R.array.scores_array);
 		String[] score_names = res.getStringArray(R.array.score_names_array);
 		
-		StorageHandler handler = new StorageHandler();
-
 		SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 		
 		String defaultValueString = res.getString(R.string.saved_score_default);
@@ -40,6 +39,9 @@ public class ScoreBoardActivity extends Activity {
 		
 		String max_scores_saved_string = res.getString(R.string.max_scores_saved);
 		int max_scores_saved = Integer.parseInt(max_scores_saved_string);
+		
+		StorageHandler handler = new StorageHandler(max_scores_saved);
+		
 		for(int i = 0; i < max_scores_saved; i++){
 
 			int score = sharedPref.getInt(scores[i], defaultValue);
@@ -53,9 +55,17 @@ public class ScoreBoardActivity extends Activity {
 			}
 		}
 		
-		TextView text = (TextView)findViewById(R.id.header);
+		Button back_button = (Button)findViewById(R.id.back_to_menu);
+		back_button.setBackgroundResource(R.drawable.start_button);
+		Typeface myTypeface = Typeface.createFromAsset(getAssets(), "bay6.ttf");
+		back_button.setTypeface(myTypeface);
+		
+		//Typeface myTypeface = Typeface.createFromAsset(getAssets(), "molten.ttf");
+		//text.setTypeface(myTypeface);
+		
 		int size = handler.GetSize();
 		ListView scoreListView = (ListView)findViewById(R.id.list);
+
 		String[] scoreArray = new String[size];
 
 		ScoreObject[] scores_from_file = handler.GetHighScores();
@@ -65,7 +75,7 @@ public class ScoreBoardActivity extends Activity {
 			
 			int minutes = (scores_from_file[i].score / 100);
 			int seconds = scores_from_file[i].score - (minutes * 100);
-			score_line = "NAME : " + scores_from_file[i].name + "\t\t\t SCORE : ";
+			score_line = (i+1) + ". NAME : " + scores_from_file[i].name + "\t\t\t SCORE : ";
 			
 			if(minutes < 10){
 				score_line += "0";
@@ -76,14 +86,6 @@ public class ScoreBoardActivity extends Activity {
 			}
 			score_line += seconds;
 			
-//			if(scores_from_file[i].score < 100){
-//				score_line = "NAME : " + scores_from_file[i].name + "\t\t SCORE : 0:" + scores_from_file[i].score ;
-//			}
-//			else{
-//				int minutes = (scores_from_file[i].score / 100);
-//				int seconds = scores_from_file[i].score - (minutes * 100);
-//				score_line = "NAME : " + scores_from_file[i].name + "\t\t SCORE : " + minutes + ":" + seconds;
-//			}
 			scoreArray[i] = score_line;
 		}
 		
@@ -95,7 +97,6 @@ public class ScoreBoardActivity extends Activity {
 	    ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(this, R.layout.simplerow, planetList);
 	    
 	    scoreListView.setAdapter( listAdapter );
-	    
 	}
 
 	@Override
@@ -112,7 +113,6 @@ public class ScoreBoardActivity extends Activity {
 	}
 	
 	public void onBackPressed(){
-		//super.onBackPressed();
 		Intent intent = new Intent (this, StartScreenActivity.class);
 		startActivity(intent);
 	}

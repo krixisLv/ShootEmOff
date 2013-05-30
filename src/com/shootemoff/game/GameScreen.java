@@ -7,10 +7,12 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 
 import com.shootemoff.framework.Graphics;
 import com.shootemoff.framework.Screen;
+import com.shootemoff.shootemoffgame.R;
 
 
 public class GameScreen extends Screen 
@@ -36,8 +38,9 @@ public class GameScreen extends Screen
 	int shieldControlShieldColor = 0xee000000;
 	int gunControlColor = 0x80727673;
 	int gunshotColor = 0xffFF000D;
+	int fadeColor = 0x77000000;
         
-    public GameScreen(GameActivity game)
+    public GameScreen(GameActivity game, OptionsObject options)
     {
     	super(game);
     	gActivity = game;
@@ -70,8 +73,10 @@ public class GameScreen extends Screen
 		gradient.setGradientRadius((int) world.offScreenRadius);
 		gradient.setDither(false);
 		gradient.setGradientCenter(0.2F, 0.5F);
-		gradient.setBounds(new Rect(0, 0, game.getGraphics().getWidth(),
-				   	game.getGraphics().getHeight()));
+		Rect bounds = new Rect(0, 0, game.getGraphics().getWidth(),
+			   	game.getGraphics().getHeight());
+		
+		gradient.setBounds(bounds);
 		
 		paint.setTextSize(((float)game.getGraphics().getHeight()) / 16F);
 		paint.setTextAlign(Paint.Align.CENTER);
@@ -181,40 +186,72 @@ public class GameScreen extends Screen
 					dot.maxRadius * dot.energy, paint);
 		}
 	
-		if(world.state == World.GameState.Running)
-			drawMessage(world.getTime(), c);
-//		else if(world.state == World.GameState.Ready)
-//			drawMessage(r.getString(R.string.ready), c);
-//		else if(world.state == World.GameState.Paused)
-//			drawMessage(r.getString(R.string.paused), c);
+		if(world.state == World.GameState.Running){
+			drawTime(world.getTime(), c);
+		}
+		else if(world.state == World.GameState.Ready){
+			drawMessage(r.getString(R.string.ready), "score to beat: ", c);
+		}
+		else if(world.state == World.GameState.Paused){
+			FadeScreen(c);
+			drawMessage(r.getString(R.string.its_over),  world.getTime(), c);
+		}
 		else if(world.state == World.GameState.GameOver){
 			ReturnGameResult(world.getTime());
 		}
 	}
+    
+    private void FadeScreen(Canvas c)
+    {
+    	Rect bounds = new Rect(0, 0, game.getGraphics().getWidth(),
+			   	game.getGraphics().getHeight());
+    	
+        paint.setColor(fadeColor);
+        paint.setStyle(Paint.Style.FILL);
+        c.drawRect(bounds, paint); 
+    }
     
     private void ReturnGameResult(String score)
     {
     	gActivity.finishActivity(score);
     }
     
-    private void drawShieldPadMessage(String message, Canvas c)
+    private void drawMessage(String message, String score, Canvas canvas)
     {
+//    	Typeface tf = Typeface.create("Helvetica",Typeface.BOLD);
+//    	Paint opaint = new Paint();
+//    	opaint.setTypeface(tf);
+//    	canvas.drawText("Sample text in bold Helvetica",0,0,opaint);
+    	
+    	
     	float oldSize = paint.getTextSize();
-    	paint.setTextSize((float)(Math.ceil(oldSize*0.9)));
+    	paint.setTextSize((float)(Math.ceil(oldSize*1.1)));
+    	
+    	//Typeface tf = Typeface.createFromAsset(((Context) game).getAssets(), "bay6.ttf");
+    	//paint.setTypeface(tf);
+
+    	float sentenceWidth = paint.measureText(message);
+    	float startPositionY = (canvas.getHeight() - sentenceWidth) / 2;
+    	float startPositionX = (float)(canvas.getWidth() / 1.2);
     	
     	paint.setStrokeWidth(0.0F);
 		paint.setColor(0xee111111);
 	    paint.setStyle(Paint.Style.FILL);
+    	
+    	canvas.save();
+	    canvas.rotate(90, canvas.getWidth()/2, canvas.getHeight()/2);
+	    canvas.drawText(message, startPositionX - (sentenceWidth/2), startPositionY, paint);
 	    
-	    float coordX = (float)(c.getWidth()* 0.25);
-	    float coordY = (float)(c.getHeight()* 0.95);
-
-		c.drawText(message, coordX, coordY, paint);
+	    score = "You did " + score + " seconds!";
+	    sentenceWidth = paint.measureText(score);
+	    startPositionY = (canvas.getHeight() - sentenceWidth) / 2;
+	    canvas.drawText(score, startPositionX - (sentenceWidth/2) , startPositionY  + paint.getTextSize(), paint);
+		canvas.restore();
 		
 		paint.setTextSize((float)oldSize);
     }
 
-	private void drawMessage(String message, Canvas canvas)
+	private void drawTime(String message, Canvas canvas)
 	{
 		float y = (float)(paint.getTextSize());
 		float x = (float)(canvas.getWidth() - paint.getTextSize());
@@ -228,16 +265,16 @@ public class GameScreen extends Screen
 		    canvas.rotate(90, x, y);
 			canvas.drawText(line, x, y, paint);
 			canvas.restore();
+			
 			// Draw white text
 			paint.setStrokeWidth(0.0F);
-			paint.setColor(0xffffffff);
+			paint.setColor(0xffFFC31F);
 		    paint.setStyle(Paint.Style.FILL);
 	
 		    canvas.save();
 		    canvas.rotate(90, x, y);
 		    canvas.drawText(line, x, y, paint);
 		    canvas.restore();
-			//c.drawText(line, c.getWidth(), y, paint);
 	
 			y += paint.getTextSize();
 		}

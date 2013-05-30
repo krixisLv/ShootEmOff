@@ -10,7 +10,14 @@
         android:minSdkVersion="5"
         android:targetSdkVersion="17" />
 
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
+    
     <application
+        android:allowBackup="false"
         android:icon="@drawable/icon"
         android:label="@string/app_name" >
         <activity
@@ -24,26 +31,24 @@
             android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name="com.shootemoff.game.GameOverActivity"
-            android:label="@string/title_activity_game_over"
+            android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
         <activity
             android:name="com.shootemoff.game.ScoreBoardActivity"
-            android:label="@string/title_activity_score_board"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name="com.shootemoff.game.SettingsActivity"
+            android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
     </application>
-
-    <supports-screens
-        android:anyDensity="true"
-        android:largeScreens="true"
-        android:normalScreens="true"
-        android:smallScreens="true" />
 
 </manifest>

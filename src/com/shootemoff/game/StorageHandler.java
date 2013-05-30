@@ -10,12 +10,12 @@ import com.shootemoff.shootemoffgame.R;
 
 public class StorageHandler
 {
-	private ScoreObject[] theScores = new ScoreObject[10];
+	private ScoreObject[] theScores;
 	private int size = 0;
 	
-	public StorageHandler()
+	public StorageHandler(int max_size)
 	{
-		//nothing to do
+		theScores = new ScoreObject[max_size];
 	}
 	
 	public int GetSize()

@@ -11,19 +11,30 @@ public class GameActivity extends AndroidGame
     @Override
     public Screen getStartScreen() 
     {
-        return new GameScreen(this); 
+    	OptionsObject options = GetGameOptions();
+    	
+        return new GameScreen(this, options); 
     }
     
     public void finishActivity(String score)
     {
+
     	Intent returnIntent = new Intent();
 		returnIntent.putExtra("result",score);
-		setResult(RESULT_OK, returnIntent);     
+		
+		setResult(RESULT_OK, returnIntent);
+
 		finish();
     }
     
+    private OptionsObject GetGameOptions()
+    {
+    	OptionsObject options = new OptionsObject();
+    	
+    	return options;
+    }
+    
     public void onBackPressed(){
-    	//Your code here
     	super.onBackPressed();
 	}
 }

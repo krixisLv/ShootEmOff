@@ -41,6 +41,7 @@ public class GameOverActivity extends Activity
 		score_string += seconds;
 		
 		t.setText(score_string);
+		
 	}
 
 	@Override
@@ -51,38 +52,48 @@ public class GameOverActivity extends Activity
 		return true;
 	}
 
+	/**
+	 * @param view
+	 */
 	public void StoreScore(View view)
 	{
 		TextView t = (TextView)findViewById(R.id.username); 
 		String username = t.getText().toString();
 		
 		Resources res = getResources();
+		
+		// gathering the predefined variable names
 		String[] scores = res.getStringArray(R.array.scores_array);
 		String[] score_names = res.getStringArray(R.array.score_names_array);
-		
-		StorageHandler handler = new StorageHandler();
 
 		SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 		
+		//read predefined values, used to check if read resaurce is valid
 		String defaultValueString = res.getString(R.string.saved_score_default);
 		int defaultValue = Integer.parseInt(defaultValueString);
 		String defaultName = res.getString(R.string.saved_score_name_default);
 		
 		String max_scores_saved_string = res.getString(R.string.max_scores_saved);
 		int max_scores_saved = Integer.parseInt(max_scores_saved_string);
+		
+		StorageHandler handler = new StorageHandler(max_scores_saved);
+		
 		for(int i = 0; i < max_scores_saved; i++){
 
 			int score = sharedPref.getInt(scores[i], defaultValue);
 
 			if(score != defaultValue){
 				String name = sharedPref.getString(score_names[i], defaultName);
+				//saving name -> values pairs, easier to manipulate when sorting and saving afterwards
 				handler.AddScore(name, score);
 			}
 			else{
+				// read until all the values are stored, array might not be full
 				break;
 			}
 		}
 		
+		//score need to be higher than already saved to be considered valid, or there are no enough scores
 		boolean isScoreAdded = handler.AddScore(username, game_score);
 		
 		if(isScoreAdded == true){
@@ -91,7 +102,8 @@ public class GameOverActivity extends Activity
 			
 			int size = handler.GetSize();
 			ScoreObject[] scores_to_save = handler.GetHighScores();
-			
+			//distribute the sorted values in the correct sequence
+			//TODO: should add date parameter so the oldest values stay higher
 			for(int i = 0; i < size; i++){
 				editor.putInt(scores[i], scores_to_save[i].score);
 				editor.putString(score_names[i], scores_to_save[i].name);
@@ -111,13 +123,12 @@ public class GameOverActivity extends Activity
 				    Toast.LENGTH_LONG).show();
 		}
 
+		//finish by showing the scoreboard either way score was saved or not
 		Intent intent = new Intent (this, ScoreBoardActivity.class);
-
 		startActivity(intent);
 	}
 	
 	public void onBackPressed(){
-		//Nothing to do
 		super.onBackPressed();
 	}
 

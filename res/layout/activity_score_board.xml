@@ -1,42 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/score_board"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="#4F0909"
     android:orientation="vertical" >
 
-<TextView
-  android:id="@+id/header"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:text="@string/score_board"
-  />
-<!--<TextView
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:hint="Enter File Name" />
-<EditText
-  android:id="@+id/filename"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content" 
-  android:inputType="text"/>
-<TextView
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:text="Enter Content" />
-<EditText
-  android:id="@+id/content"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content" 
-  android:inputType="text"/>-->
-<Button
-  android:id="@+id/back_to_menu"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
-  android:text="@string/back_to_menu"
-  android:onClick="BackToMenu"/>
-<ListView
-  android:id="@+id/list"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  />
+	<TextView
+	  android:id="@+id/header"
+	  android:layout_width="fill_parent"
+	  android:layout_height="wrap_content"
+	  android:text="@string/score_board"
+	  android:typeface="serif"
+	  android:textSize="20sp" />
+
+	<Button
+	  android:id="@+id/back_to_menu"
+	  android:layout_width="fill_parent"
+	  android:layout_height="wrap_content"
+	  android:text="@string/back_to_menu"
+	  android:onClick="BackToMenu"/>
+	
+	<ListView
+	  android:id="@+id/list"
+	  android:layout_width="fill_parent"
+	  android:layout_height="fill_parent"
+	  android:typeface="serif"
+	  android:layout_marginRight="200sp"
+      android:layout_marginLeft="200sp"/>
 </LinearLayout>

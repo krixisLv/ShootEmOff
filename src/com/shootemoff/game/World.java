@@ -153,13 +153,13 @@ public class World
 				this.base_speed = 5F;
 				break;
 			case 2:
-				this.base_speed = 10F;
-				break;
-			case 3:
 				this.base_speed = 15F;
 				break;
+			case 3:
+				this.base_speed = 25F;
+				break;
 			default:
-				this.base_speed = 10F;
+				this.base_speed = 15F;
 		}
 		
 	}
@@ -215,14 +215,18 @@ public class World
 
 	public void update(float deltaTime)
 	{
-		if(state == GameState.Ready)
+		if(state == GameState.Ready){
 			updateReady(deltaTime);
-		if(state == GameState.Running)
+		}
+		if(state == GameState.Running){
 			updateRunning(deltaTime);
-		if(state == GameState.Paused)
+		}
+		if(state == GameState.Paused){
 			updatePaused(deltaTime);
-		if(state == GameState.GameOver)
+		}
+		if(state == GameState.GameOver){
 			updateGameOver(deltaTime);
+		}
 	}
 
 	private void doInput()
@@ -317,7 +321,7 @@ public class World
 	private void updatePaused(float deltaTime)
 	{
 		if(checkTouchUp() || checkMenuUp())
-			state = GameState.Running;
+			state = GameState.GameOver;
 	}
 
 	private void updateGameOver(float deltaTime)
@@ -480,9 +484,6 @@ public class World
 	
 	private void handleShotPosition(Dot shot, Iterator<Dot> iterator)
 	{
-//		float lengthToCoreCenter = (float)Math.hypot(
-//				(double)(shot.coords.x - core.coords.x),
-//				(double)(shot.coords.y - core.coords.y));
 		
 		Graphics g = game.getGraphics();
 		if(shot.coords.x < 0 || shot.coords.y < 0 || shot.coords.x > g.getWidth() || shot.coords.x > g.getHeight()){
@@ -597,7 +598,8 @@ public class World
 			core.health -= dot.energy / CORE_HEALTH;
 			if(core.health < 0.0F)
 			{
-				state = GameState.GameOver;
+				//state = GameState.GameOver;
+				state = GameState.Paused;
 				gameOver.play(1F);
 				game.getVibration().vibrate(10);
 				game.getVibration().vibrate(40);
